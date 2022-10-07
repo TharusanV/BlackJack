@@ -46,7 +46,28 @@ def createDeck():
 og_deck = createDeck();
 altered_deck = list(og_deck)
 
-    
+playerHand = []
+playerInitialCard_X, playerInitialCard_Y = 100, 300
+playerCardPos_X = []
+
+
+computerHand = []
+computerInitialCard_X, computerInitialCard_Y = 100, 100
+computerCardPos_X = []
+
+
+def drawCard():
+    global altered_deck
+    draw = random.randint(0, len(altered_deck) - 1)
+    return altered_deck.pop(draw)
+
+def playerHit():
+    playerHand.append(drawCard())
+    if (len(playerHand) == 0):
+        playerCardPos_X.append(playerInitialCard_X)
+    else:
+        playerCardPos_X.append(playerInitialCard_X + (10*len(playerHand)))
+        
 
 def drawWindow():
     WIN.blit(pygame.transform.scale(board, (WIDTH, HEIGHT)), (0,0))
