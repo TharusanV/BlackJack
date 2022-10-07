@@ -5,21 +5,9 @@ pygame.init()
 
 
 pygame.display.set_caption('Black Jack')
-WIDTH,HEIGHT = 600, 600
+WIDTH,HEIGHT = 800, 500
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 FPS = 60
-
-playerCardValue = 0
-computerCardValue = 0
-
-playerCardInitialPos_X, playerCardInitialPos_Y = 100, 500
-computerCardInitialPos_X, computerCardInitialPos_Y = 100, 200
-
-playerCardPosMultiplier_X = 5;
-computerCardPosMultiplier_X = 5;
-
-playerNumberOfCards = 0
-computerNumberOfCards = 0
 
 #Load Images (Global)
 path = 'assets'
@@ -38,7 +26,7 @@ class Card:
 
         listOfCards.append(self)
 
-
+        
 aceH = Card('ace_hearts', 1, ace_hearts)
 aceD = Card('ace_diamonds', 1, ace_diamonds)
 aceS = Card('ace_spades', 1, ace_spades)
@@ -105,24 +93,38 @@ KS = Card('K_spades', 13, king_spades)
 KC = Card('K_clubs', 13, king_clubs)
 
 
+class User:
+    def __init__(self, name, intialCardPos_X, intialCardPos_Y):
+        self.name = name
+        self.cardValue = 0
+        self.initialCardPos_X = intialCardPos_X
+        self.initialCardPos_Y = intialCardPos_Y
+        self.numberOfCards = 0
 
+player = User("Player", 200,100)
+computer = User("Computer", 200,400)
 
 def drawWindow():
-    #WIN.blit(board, (0,0))
+    WIN.blit(pygame.transform.scale(board, (WIDTH, HEIGHT)), (0,0))
     pygame.display.update()
     
 
 def playerHit():
     playerCard = random.choice(listOfCards)
-    if playerNumberOfCards == 0:
-        WIN.blit(playerCard.image, (playerCardInitialPos_X, playerCardInitialPos_Y))
-        playerNumberOfCards = playerNumberOfCards + 1
+    if player.numberOfCards == 0:
+        WIN.blit(playerCard.image, (player.initialCardPos_X, player.initialCardPos_Y))
+        pygame.display.update
+        player.numberOfCards = player.numberOfCards + 1
+        player.cardValue = player.cardValue + playerCard.value
     else:
-        WIN.blit(playerCard.image, (playerCardInitialPos_X + (), playerCardInitialPos_Y))
-    
+        WIN.blit(playerCard.image, (player.initialCardPos_X + player.numberOfCards, player.initialCardPos_Y))
+        pygame.display.update
+        player.numberOfCards = player.numberOfCards + 1
+        player.cardValue = player.cardValue + playerCard.value
 
 def computerHit():
     computerCard = random.choice(listOfCards)
+
 
 def main():
     clock = pygame.time.Clock()
@@ -130,11 +132,14 @@ def main():
     run = True
     while run:
         clock.tick(FPS)
+        mx, my = pygame.mouse.get_pos()
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
 
         drawWindow()
+        click = False    
 
     pygame.quit()
 
