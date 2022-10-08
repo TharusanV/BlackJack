@@ -16,31 +16,15 @@ class Card:
         self.suit = suit
         self.image = image
 
-for i in CARD_NAMES:
-    for j in CARD_SUITS:
-        allCardImages_directory.append("card_Images/"+str(i)+"_"+str(j)+".png")
 
-for i in allCardImages_directory:
-    allCardImages.append(pygame.image.load(i))
-
-def createDeck():
-    deck = []
-    i = 0
-    for j in range(len(CARD_VALUES)):
-        for k in CARD_SUITS:
-            deck.append(Card(CARD_VALUES[j], CARD_NAMES[j], k, allCardImages[i]))
-            i = i + 1
-
-    return deck
-
-og_deck = createDeck();
-altered_deck = list(og_deck)
 
 def displayCard():
     global computerInitialCard_Y
+    global playerInitialCard_Y
     
     if len(playerHand) != 0:
         for i in range(len(playerHand)):
+            win.blit(playerHand[i].image, (playerCardPos_X[i], playerInitialCard_Y))
             
     if reveal:
         if len(computerHand) != 0:
@@ -116,7 +100,7 @@ def drawText():
     computer_hand_text = GUI_font.render("Computer hand:",True,white)
     player_hand_text = GUI_font.render("Your hand:",True,white)
     hand_value_text = GUI_font.render('Hand value: '+ str(getCardValue(playerHand)),True,white)
-    winner_text = WIN_font.render(win_str[win_int],True,white)
+    winner_text = WIN_font.render(winnerText,True,white)
 
     win.blit(winner_text, (10, 10))
     win.blit(hand_value_text, (10,25))
@@ -132,14 +116,98 @@ def drawText():
     win.blit(enter_text, (10,100))
 
 
-def handlePlayerInputHit(keys_pressed):
+def handlePlayerInput(keys_pressed):
+    if keys_pressed[pygame.K_ESCAPE]:
+        altered_deck = list(og_deck)
+        inSession = True
+        reveal = False
+        playerHand = []
+
+        playerCardPos_X = []
+        playerCardValue = 0
+
+        computerHand = []
+        computerHiddenHand = []
+        computerCardPos_X = []
+        computerHiddenCardPos_X = []
+        computerCardValue = 0
+
+        winnerText = ''
+    
     if keys_pressed[pygame.K_SPACE] and inSession:
         playerHit()
 
         computerDraw = computerHit()
 
         if getCardValue(computerHand) > 21 and getCardValue(playerHand) > 21:
+            session = False
+            winnerText = 'No winner, House wins'
+            reveal = True
             
+        elif getCardValue(computerHand) == 21 and getCardValue(playerHand) != 21:
+            session = False
+            winnerText = 'Computer wins'
+            reveal = True
+        elif getCardValue(computerHand) != 21 and getCardValue(playerHand) == 21:
+            session = False
+            winnerText = 'Player wins'
+            reveal = True
+            
+        elif getCardValue(computerHand) > 21:
+            session = False
+            winnerText = 'Player wins'
+            reveal = True
+        elif getCardValue(playerHand) > 21:
+            session = False
+            winnerText = 'Computer wins'
+            reveal = True
+            
+        elif getCardValue(computerHand) == 21 and getCardValue(playerHand) == 21:
+            session = False
+            winnerText = 'Tie'
+            reveal = True
+
+    if keys_pressed[pygame.K_KP_ENTER] and inSession:
+        computerDraw = computerHit()
+
+        if computerDraw == False:
+            if getCardValue(computerHand) > getCardValue(playerHand):
+                inSession = False
+                winnerText = 'Computer wins'
+                reveal = True
+            if getCardValue(computerHand) < getCardValue(playerHand):
+                inSession = False
+                winnerText = 'Player wins'
+                reveal = True
+        else:
+            if getCardValue(computerHand) > 21 and getCardValue(playerHand) > 21:
+                session = False
+                winnerText = 'No winner, House wins'
+                reveal = True
+            elif getCardValue(computerHand) == 21 and getCardValue(playerHand) == 21:
+                session = False
+                winnerText = 'Tie'
+                reveal = True
+            elif getCardValue(computerHand) > 21:
+                session = False
+                winnerText = 'Player wins'
+                reveal = True
+            elif getCardValue(computerHand) == 21 and getCardValue(playerHand) != 21:
+                session = False
+                winnerText = 'Computer wins'
+                reveal = True
+            elif getCardValue(computerHand) != 21 and getCardValue(playerHand) == 21:
+                session = False
+                winnerText = 'Player Wins'
+                reveal = True
+
+            
+#Initalising game data
+black = (0,0,0)
+white = (255,255,255)
+GUI_font = pygame.font.SysFont(None, 32)
+INST_font = pygame.font.SysFont(None, 16)
+        
 board = pygame.image.load("assets/board.png")        
 hiddenCardImage = pygame.image.load("card_Images/facedown_Card.png")
 hiddenCard = Card(0,0,0,hiddenCardImage)
@@ -149,6 +217,26 @@ CARD_NAMES = ["ace","two","three","four","five","six","seven","eight","nine","te
 CARD_SUITS = ["clubs", "diamonds", "hearts", "spades"]
 allCardImages_directory = []
 allCardImages = []
+
+for i in CARD_NAMES:
+    for j in CARD_SUITS:
+        allCardImages_directory.append("card_Images/"+str(i)+"_"+str(j)+".png")
+
+for i in allCardImages_directory:
+    allCardImages.append(pygame.image.load(i))
+
+def createDeck():
+    deck = []
+    i = 0
+    for j in range(len(CARD_VALUES)):
+        for k in CARD_SUITS:
+            deck.append(Card(CARD_VALUES[j], CARD_NAMES[j], k, allCardImages[i]))
+            i = i + 1
+
+    return deck
+
+og_deck = createDeck();
+altered_deck = list(og_deck)
         
 playerHand = []
 playerInitialCard_X, playerInitialCard_Y = 100, 300
@@ -160,8 +248,11 @@ computerHiddenHand = []
 computerInitialCard_X, computerInitialCard_Y = 100, 100
 computerCardPos_X = []
 computerHiddenCardPos_X = []
-computerCardValue = 0       
-        
+computerCardValue = 0
+
+winnerText = ''
+reveal = False
+inSession = True        
 
 def drawWindow():
     WIN.blit(pygame.transform.scale(board, (WIDTH, HEIGHT)), (0,0))
@@ -177,15 +268,15 @@ def main():
     while run:
         clock.tick(FPS)
         mx, my = pygame.mouse.get_pos()
+        keys_pressed = pygame.key.get_pressed()
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-
+                
         drawWindow()
-        keys_pressed = pygame.key.get_pressed()
-        
-        click = False    
+        handlePlayerInput(keys_pressed)
+        displayCard()    
 
     pygame.quit()
 
