@@ -40,6 +40,7 @@ def displayCard():
         if len(computerHiddenHand) != 0:
             for i in range(len(computerHiddenHand)):
                 WIN.blit(computerHiddenHand[i].image, (computerHiddenCardPos_X[i], computerInitialCard_Y))
+                WIN.blit(computerHand[0].image, (computerCardPos_X[0], computerInitialCard_Y))
 
     pygame.display.update() 
 
